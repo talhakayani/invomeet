@@ -1,5 +1,4 @@
 const { App } = require('@slack/bolt');
-const { WebClient } = require('@slack/web-api');
 const axios = require('axios');
 const rooms = require('./models/rooms');
 require('dotenv').config();
@@ -13,64 +12,6 @@ const app = new App({
   appToken: process.env.APP_TOKEN,
 });
 
-// const getRooms = url => {
-//   let allRooms = '';
-//   axios
-//     .get(url.toString())
-//     .then(response => {
-//       const { status, message, body } = response.data;
-//       console.log(status, message, body);
-//       if (status == 200) {
-//         body.forEach(obj => {
-//           allRooms += `Room Name: ${obj.name}\n
-//             Location: ${obj.floor}\n
-//             Availability: ${obj.status}\n`;
-//         });
-//         return allRooms.toString();
-//       } else {
-//         allRooms = message;
-//         return allRooms.toString();
-//       }
-//     })
-//     .catch(err => {
-//       return err.toString();
-//     });
-// };
-
-const sendMessage = async roomsJSONArray => {
-  //say(allRooms);
-  await axios
-    .post(
-      URL_MESSAGE,
-      {
-        channel: '#random',
-        // blocks: roomsJSONArray,
-        blocks: [
-          {
-            type: 'plain_text',
-            text: '*Red Room*',
-            fields: [
-              { type: 'mrkdwn', text: 'Location: 1st Floor' },
-              { type: 'mrkdwn', text: 'Capacity: 13' },
-              { type: 'mrkdwn', text: 'Availability: Available' },
-            ],
-          },
-        ],
-        username: 'Invomeet Rooms',
-      },
-      {
-        headers: {
-          authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
-        },
-      }
-    )
-    .then(response => {
-      console.log(response);
-    })
-    .catch(err => {
-      console.log(err);
-    });
-};
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Commands //////////////////////////////////////////
@@ -78,46 +19,23 @@ const sendMessage = async roomsJSONArray => {
 /////////////////////////////////////////////////////////////////////////////////
 
 app.command('/rooms', async ({ command, ack, say }) => {
+  console.log(command);
   try {
     await ack();
-    // let allRooms = '';
+    let allRooms = '';
     axios
       .get('http://localhost:3000/rooms/all')
       .then(response => {
         const { status, message, body } = response.data;
         //   console.log(status, message, body);
         if (status == 200) {
-          /**
-           * {
-      type: 'section',
-      text: { type: 'mrkdwn', text: 'New order!' },
-      fields: [
-        { type: 'mrkdwn', text: '*Name*\nJohn Smith' },
-        { type: 'mrkdwn', text: '*Amount*\n$8.50' },
-      ]
-    },
-           */
-          const roomsJSONArray = [];
+          //const roomsJSONArray = [];
           body.forEach(obj => {
-            // allRooms += `Room Name: ${obj.name}\n
-            // Location: ${obj.floor}\n
-            // Availability: ${obj.status}\n`;
-            let objs = {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: '*' + obj.name + '*',
-                fields: [
-                  { type: 'mrkdwn', text: 'Location: ' + obj.floor },
-                  { type: 'mrkdwn', text: 'Capacity: ' + obj.capacity },
-                  { type: 'mrkdwn', text: 'Availability: ' + obj.status },
-                ],
-              },
-            };
-            roomsJSONArray.push(objs);
+            allRooms += `Room Name: ${obj.name}\n
+            Location: ${obj.floor}\n
+            Availability: ${obj.status}\n`;
           });
-          console.log(...roomsJSONArray);
-          sendMessage(roomsJSONArray);
+          say(allRooms);
         } else {
           allRooms = message;
           say(allRooms);
@@ -141,7 +59,6 @@ app.command('/roomsavailable', async ({ command, ack, say }) => {
       .get('http://localhost:3000/rooms/available')
       .then(response => {
         const { status, message, body } = response.data;
-        console.log(status, message, body);
         if (status == 200) {
           body.forEach(obj => {
             allRooms += `Room Name: ${obj.name}\n
@@ -158,7 +75,6 @@ app.command('/roomsavailable', async ({ command, ack, say }) => {
         console.log('something went wrong');
         console.log(err);
       });
-    // say(getRooms('http://localhost:3000/rooms/available'));
   } catch (err) {
     console.error(err);
   }
