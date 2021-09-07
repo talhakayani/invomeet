@@ -1,0 +1,125 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "InvoMeet is a slack bot which helps to manage the meeting rooms.",
+    "version": "1.0.0",
+    "title": "InvoMeet",
+    "contact": {
+      "email": "talha.kayani@invozone.com"
+    },
+    "tags": [
+      {
+        "name": "Rooms",
+        "description": "Holds all record about rooms in InvoZone"
+      }
+    ],
+    "paths": {
+      "/rooms/add": {
+        "post": {
+          "tags": ["Rooms"],
+          "summary": "add room to the database of InvoZone",
+          "description": "this CRUD operation will help us to add the room to database of InvoZone",
+          "operationId": "addRoom",
+          "consumes": ["application/json"],
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Room object that needs to be initalized in the body so we can add this room to the database for future use",
+              "required": true,
+              "schema": {
+                "#ref": "#definitions/Rooms",
+                "example": {
+                  "name": "Red",
+                  "floor": "Ground",
+                  "capacity": 23,
+                  "status": "available"
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Room added Successfully"
+            },
+            "400": {
+              "description": "Unable to add the room"
+            }
+          }
+        }
+      },
+      "/rooms/all": {
+        "get": {
+          "tags": ["Rooms"],
+          "summary": "All meeting rooms",
+          "description": "Reterive all the information about all the meeting rooms available in the database",
+          "operationId": "getAllRooms",
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Rooms are reterived successfully"
+            },
+            "400": {
+              "description": "Something went wrong"
+            }
+          }
+        }
+      },
+      "/room/{name}": {
+        "get": {
+          "tags": ["Rooms"],
+          "summary": "Search room by name",
+          "description": "Provide the name of the room to the path and get the information about that particular room",
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Room record reterived"
+            },
+            "400": {
+              "description": "Something went wrong"
+            }
+          }
+        }
+      },
+      "/room/floor/{floor}": {
+        "get": {
+          "tags": ["Rooms"],
+          "summary": "All rooms on floor",
+          "description": "This will give you the information about all rooms on floor provided in path",
+          "operationId": "getRoomByFloor",
+          "produces":["application/json"],
+          "responses":{
+              
+          }
+        }
+      }
+    },
+    "definitions": {
+      "Rooms": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the meeting room"
+          },
+          "floor": {
+            "type": "string",
+            "description": "The location of the meeting room in InvoZone office. The location will be provided by the mentioning the name of the floor (e.g. ground, 1st, 2nd and so on)"
+          },
+          "capacity": {
+            "type": "integer",
+            "description": "The number of seats are available inside the meeting room"
+          },
+          "status": {
+            "type": "string",
+            "description": "This will show the status of the meetin room, is it avialable or busy"
+          }
+        },
+        "xml": {
+          "name": "Rooms"
+        }
+      }
+    }
+  }
+}
