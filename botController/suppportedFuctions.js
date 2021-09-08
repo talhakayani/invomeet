@@ -29,10 +29,10 @@ exports.getCompleteMentionInfo = async mentions => {
   return details;
 };
 
-exports.getAllRooms = async () => {
+exports.getAllRooms = async url => {
   let allRooms = [];
   await axios
-    .get('http://localhost:3000/rooms/available')
+    .get(url)
     .then(response => {
       const { status, message, body } = response.data;
       if (status == 200) {
@@ -48,13 +48,13 @@ exports.getAllRooms = async () => {
   else return allRooms;
 };
 
-const makeJSONblock = rooms => {
+const makeJSONblock = (rooms, available) => {
   let roomsJSONBlock = [
     {
       type: 'header',
       text: {
         type: 'plain_text',
-        text: 'Available Rooms',
+        text: available ? 'Available Rooms' : 'All Rooms',
         emoji: true,
       },
     },
@@ -84,7 +84,7 @@ const makeJSONblock = rooms => {
           },
           {
             type: 'mrkdwn',
-            text: `*Room Status*:\n${room.status}`,
+            text: `*Room Status*:\n*${room.status.toUpperCase}*`,
           },
         ],
       },
@@ -97,11 +97,11 @@ const makeJSONblock = rooms => {
   return roomsJSONBlock;
 };
 
-exports.sendMessage = async (channelId, rooms, app) => {
+exports.sendMessage = async (channelId, rooms, app, queryRoom) => {
   const result = await app.client.chat.postMessage({
     token: process.env.SLACK_BOT_TOKEN,
     channel: channelId,
-    blocks: makeJSONblock(rooms),
+    blocks: makeJSONblock(rooms, queryRoom),
   });
   console.log(result);
 };

@@ -24,28 +24,17 @@ const app = new App({
 app.command('/rooms', async ({ command, ack, say }) => {
   console.log(command);
   try {
-    await ack();
-    let allRooms = '';
-    axios
-      .get('http://localhost:3000/rooms/all')
-      .then(response => {
-        const { status, message, body } = response.data;
-        if (status == 200) {
-          body.forEach(obj => {
-            allRooms += `Room Name: ${obj.name}\n
-            Location: ${obj.floor}\n
-            Availability: ${obj.status}\n`;
-          });
-          say(allRooms);
-        } else {
-          allRooms = message;
-          say(allRooms);
-        }
-      })
-      .catch(err => {
-        console.log('something went wrong');
-        console.log(err);
-      });
+    await Promise.all([
+      ack(),
+      botController.getAllRooms('http://localhost:3000/rooms/all'),
+    ]).then(([ackResult, allRoomsAvailable]) => {
+      botController.sendMessage(
+        command.channel_id,
+        allRoomsAvailable,
+        app,
+        false
+      );
+    });
   } catch (err) {
     console.error(err);
   }
@@ -58,11 +47,16 @@ app.command('/roomsavailable', async ({ command, ack, say }) => {
     console.log(mentions);
     await Promise.all([
       ack(),
-      botController.getAllRooms(),
+      botController.getAllRooms('http://localhost:3000/rooms/available'),
       botController.getCompleteMentionInfo(mentions),
     ])
       .then(([ackResult, allRoomsAvailable, allMentionedUserInfo]) => {
-        botController.sendMessage(command.channel_id, allRoomsAvailable, app);
+        botController.sendMessage(
+          command.channel_id,
+          allRoomsAvailable,
+          app,
+          true
+        );
         // console.log(allRoomsAvailable, allMentionedUserInfo);
       })
       .catch(err => {
