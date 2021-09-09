@@ -1,3 +1,4 @@
+// rename to slack bot
 const { App } = require('@slack/bolt');
 const axios = require('axios');
 const rooms = require('./models/rooms');

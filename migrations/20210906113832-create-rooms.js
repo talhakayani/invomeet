@@ -30,6 +30,7 @@ module.exports = {
       },
     });
   },
+  // onCreate add a user 
   down: async (queryInterface, DataTypes) => {
     await queryInterface.dropTable('rooms');
   },

@@ -5,7 +5,7 @@ const expressApp = express();
 expressApp.use(express.json());
 const PORT = process.env.PORT || 3000;
 const roomsRoute = require('./routes/roomsRoute');
-
+// single file for all routes. 
 expressApp.use('/', roomsRoute);
 
 expressApp.listen(PORT, async () => {

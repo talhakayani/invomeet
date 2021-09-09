@@ -2,24 +2,29 @@ const { response } = require('express');
 const { Rooms } = require('../models');
 const rooms = require('../models/rooms');
 
-exports.addRoom = async (req, res) => {
+exports.addRoom = async (req, res, _next) => {
   const body = req.body;
   try {
     if (!body) throw new Error('No posted data attached with body');
-    await Rooms.create(body)
-      .then(response => {
-        if (!response) throw new Error('Ops! room not created');
-        else {
-          res
-            .status(200)
-            .json({ status: 200, message: 'Room created!', body: response });
-        }
-      })
-      .catch(err =>
-        res.status(400).json({ status: 400, message: err.message })
-      );
+    // schema validation using JOI    
+    const response = await Rooms.create(body);
+    if (!response) 
+      throw new Error('Ops! room not created');
+    return res.status(200).json({ status: 200, message: 'Room created!', body: response });
+    // await Rooms.create(body)
+    //   .then(response => {
+    //     if (!response) throw new Error('Ops! room not created');
+    //     else {
+    //       res
+    //         .status(200)
+    //         .json({ status: 200, message: 'Room created!', body: response });
+    //     }
+    //   })
+    //   .catch(err =>
+    //     res.status(400).json({ status: 400, message: err.message })
+    //   );
   } catch (err) {
-    res.status(400).json({ status: 400, message: err.message });
+    return res.status(400).json({ status: 400, message: err.message });
   }
 };
 
