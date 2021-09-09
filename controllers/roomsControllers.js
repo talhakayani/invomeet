@@ -145,3 +145,32 @@ exports.getAvailableRooms = async (req, res) => {
     res.status(400).json({ status: 400, message: err.message });
   }
 };
+
+exports.updateStatus = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
+    await Rooms.update(
+      { status },
+      {
+        where: {
+          id: id,
+        },
+      }
+    )
+      .then(room => {
+        if (room) {
+          res.status(200).json({ status: 200, message: 'status updated' });
+        } else {
+          res
+            .status(400)
+            .json({ status: 400, message: 'unable to update status' });
+        }
+      })
+      .catch(err => {
+        res.status(400).json({ status: 400, message: err.message });
+      });
+  } catch (err) {
+    res.status(400).json({ status: 400, message: err.message });
+  }
+};

@@ -19,5 +19,5 @@ router.get('/rooms/all', roomsController.getAllRooms);
 router.get('/room/:name', roomsController.getRoomByName);
 router.get('/room/floor/:floor', roomsController.getRoomsByFloor);
 router.get('/rooms/available', roomsController.getAvailableRooms);
-
+router.put('/room/status/:id', roomsController.updateStatus);
 module.exports = router;
